@@ -1,4 +1,28 @@
-<!doctype html>
+<?php
+global $pdo;
+if($_SERVER["REQUEST_METHOD"]=="POST") {
+    include $_SERVER['DOCUMENT_ROOT'] . "/config/connection_database.php";
+    $name=$_POST["name"];
+    $description=$_POST["description"];
+
+
+    $filename = $_FILES["image"]["name"];
+    $filename = str_replace(' ', '_', $filename);
+    $filepath = "images/" . $filename;
+    move_uploaded_file($_FILES["image"]["tmp_name"], $filepath);
+    //echo "$name $image $description\n";
+    // Insert query
+    $sql = "INSERT INTO books (name, image, description) VALUES (?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+
+    // Execute the query with the data
+    $stmt->execute([$name, $filepath, $description]);
+    header("Location: /");
+    exit;
+}
+
+?>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,35 +39,52 @@
     include $_SERVER['DOCUMENT_ROOT'] . "/_header.php";
     ?>
 
-    <h1 class="text-center">Add product</h1>
+    <h1 class="text-center mt-5 mb-5">Add Book</h1>
 
 
-    <form class="col-md-6 offset-md-3 needs-validation" novalidate>
+    <form enctype="multipart/form-data" class="col-md-6 offset-md-3 needs-validation" method="post" novalidate>
         <div class="mb-3">
-            <label for="validationCustom01" class="form-label">Category</label>
-            <input type="text" class="form-control" id="validationCustom02" required>
+            <label for="validationCustom01" class="form-label">Name</label>
+            <input name="name" type="text" class="form-control" id="validationCustom02" required>
             <div class="invalid-feedback">
-                Please provide a valid name of category.
+                Please provide a valid name of book.
             </div>
         </div>
 
+<!--        <div class="mb-3">-->
+<!--            <label for="validationCustom01" class="form-label">Image</label>-->
+<!--            <input name="image" type="text" class="form-control" id="validationCustom02" required>-->
+<!--            <div class="invalid-feedback">-->
+<!--                Please provide a valid image.-->
+<!--            </div>-->
+<!--        </div>-->
 
         <div class="row">
             <div class="col-md-3">
 
-                    <img onclick="triggerFileInput()" alt="Selected photo" src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg" id="frame" width="100%"/>
+                <img onclick="triggerFileInput()" alt="Selected photo" src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg" id="frame" width="100%"/>
 
             </div>
             <div class="col-md-9">
                 <div class="mb-3">
                     <label for="image" class="form-label">Choose image...</label>
-                    <input required onchange="preview()"  class="form-control inputImage"  type="file" id="formFile" name="image" accept="image/*">
+                    <input name="image" required onchange="preview()"  class="form-control inputImage"  type="file" id="formFile"  accept="image/*">
                     <div class="invalid-feedback">
                         Please provide a valid image.
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="mb-3">
+            <label for="validationCustom01" class="form-label">Description</label>
+            <textarea name="description" type="text" class="form-control" id="validationCustom02" required></textarea>
+            <div class="invalid-feedback">
+                Please provide a valid description.
+            </div>
+        </div>
+
+
 
         <button type="submit" class="btn btn-primary mt-3">Add</button>
     </form>
