@@ -1,88 +1,75 @@
-<?php
-global $pdo;
-include $_SERVER['DOCUMENT_ROOT'] . "/config/connection_database.php";
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_book'])) {
-    $bookId = $_POST['edit_book'];
-
-
-    // Fetch book details for the given ID
-    $sql = "SELECT id, name, image, description FROM books WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $bookId, PDO::PARAM_INT);
-    $stmt->execute();
-    $book = $stmt->fetch(PDO::FETCH_ASSOC);
-} else {
-    // Redirect to the main page if no book ID is provided
-    header("Location: /"); // Redirect to the main page or any other page after deletion
-    exit();
-}
-?>
+<?php include $_SERVER["DOCUMENT_ROOT"]."/edit_post.php"; ?>
 
 <!doctype html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Main page</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/site.css">
+    <title>Edit</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
-    <div class="container py-3">
+<div class="container py-3">
+    <?php
+    include $_SERVER['DOCUMENT_ROOT'] . "/_header.php";
+    ?>
 
-        <?php
-        include $_SERVER['DOCUMENT_ROOT'] . "/_header.php";
-        ?>
+    <h1 class="text-center">Edit book</h1>
 
-        <h1 class="text-center mt-5 mb-5">Edit Book</h1>
+    <form class="col-md-6 offset-md-3" method="post" enctype="multipart/form-data">
+        <input type="hidden" value="<?php echo $id; ?>" name="id"/>
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" name="name" id="name"
+                   value="<?php echo $name ?>">
+        </div>
 
-        <form enctype="multipart/form-data" method="post" class="col-md-6 offset-md-3 needs-validation" action="actions/update_book.php">
-            <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
+<!--        <div class="row">-->
+<!--            <div class="col-md-4">-->
+<!--                <img src="/images/--><?php //echo $image; ?><!--"-->
+<!--                     alt="Обране фото" width="100%">-->
+<!--            </div>-->
+<!--            <div class="col-md-8">-->
+<!--                <div class="mb-3">-->
+<!--                    <label for="image" class="form-label">Choose photo</label>-->
+<!--                    <input class="form-control" type="file" id="image" name="image" accept="image/*">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
+        <div class="row">
+            <div class="col-md-3">
 
-            <div class="mb-3">
-                <label for="validationCustom01" class="form-label">Name</label>
-                <input name="name" type="text" value="<?php echo $book['name']; ?>" class="form-control" id="validationCustom02" required>
-                <div class="invalid-feedback">
-                    Please provide a valid name of book.
-                </div>
+                <img src="/images/<?php echo $image; ?>" onclick="triggerFileInput()" id="frame" width="100%"/>
+
             </div>
-
-            <div class="row">
-                <div class="col-md-3">
-
-                    <img onclick="triggerFileInput()" alt="Selected photo" src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg" id="frame" width="100%"/>
-
-                </div>
-                <div class="col-md-9">
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Choose image...</label>
-                        <input value="<?php echo $book['image']; ?>" name="image" required onchange="preview()"  class="form-control inputImage"  type="file" id="formFile"  accept="image/*">
-                        <div class="invalid-feedback">
-                            Please provide a valid image.
-                        </div>
+            <div class="col-md-9">
+                <div class="mb-3">
+                    <label for="image" class="form-label">Choose image...</label>
+                    <input name="image" required onchange="preview()"  class="form-control inputImage"  type="file" id="formFile"  accept="image/*">
+                    <div class="invalid-feedback">
+                        Please provide a valid image.
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label for="validationCustom01" class="form-label">Description</label>
-                <textarea name="description" type="text" class="form-control" id="validationCustom02" required><?php echo $book['description']; ?></textarea>
-                <div class="invalid-feedback">
-                    Please provide a valid description.
-                </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary">Update</button>
-        </form>
-    </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" name="description" id="description"><?php echo $description; ?></textarea>
+        </div>
 
-    <script src="js/validation.js"></script>
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/imageChange.js"></script>
 
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+
+</div>
+<script src="js/validation.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/imageChange.js"></script>
 </body>
 </html>

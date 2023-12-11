@@ -3,20 +3,22 @@ global $pdo;
 if($_SERVER["REQUEST_METHOD"]=="POST") {
     include $_SERVER['DOCUMENT_ROOT'] . "/config/connection_database.php";
     $name=$_POST["name"];
+    $image_name="";
+    if(isset($_FILES["image"])) {
+        $dir = "images";
+        $image_name = uniqid().".".pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+        $dir_save = $_SERVER["DOCUMENT_ROOT"]."/".$dir."/".$image_name;
+        move_uploaded_file($_FILES["image"]["tmp_name"], $dir_save);
+
+    }
     $description=$_POST["description"];
-
-
-    $filename = $_FILES["image"]["name"];
-    $filename = str_replace(' ', '_', $filename);
-    $filepath = "images/" . $filename;
-    move_uploaded_file($_FILES["image"]["tmp_name"], $filepath);
     //echo "$name $image $description\n";
     // Insert query
     $sql = "INSERT INTO books (name, image, description) VALUES (?, ?, ?)";
     $stmt = $pdo->prepare($sql);
 
     // Execute the query with the data
-    $stmt->execute([$name, $filepath, $description]);
+    $stmt->execute([$name, $image_name, $description]);
     header("Location: /");
     exit;
 }

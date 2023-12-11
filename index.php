@@ -59,21 +59,17 @@
             <tr>
                 <th scope="row"><?php echo $n++;?> </th>
                 <td>
-                    <img src=<?php echo $row["image"];?>
+                    <img src=/images/<?php echo $row["image"];?>
                          height="150"
                          alt="Book">
                 </td>
                 <td><?php echo $row["name"];?></td>
                 <td>
                     <a href="#" class="btn btn-info">Show</a>
-                    <form method="post" action="edit.php" style="display: inline;">
-                        <input type="hidden" name="edit_book" value="<?php echo $row['id']; ?>">
-                        <button type="submit" class="btn btn-primary">Edit</button>
-                    </form>
-                    <form method="post" action="actions/delete_book.php" style="display: inline;">
-                        <input type="hidden" name="delete_book" value="<?php echo $row['id']; ?>">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this book?')">Delete</button>
-                    </form>
+                    <a href="/edit.php?id=<?php echo $row["id"]; ?>" class="btn btn-dark">Edit</a>
+                    <a href="#" class="btn btn-danger" data-delete="<?php echo $row["id"]; ?>">Delete</a>
+
+
                 </td>
             </tr>
         <?php }?>
@@ -81,7 +77,62 @@
     </table>
 </div>
 
+<!-- Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="modalDelete">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Are you sure?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You want to delete this book</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="btnDeleteConfirm">Delete</button>
+                <!-- Additional buttons if needed -->
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+    var myModal = new bootstrap.Modal(document.getElementById('modalDelete'));
+    let id = 0;
+    const list = document.querySelectorAll('[data-delete]');
+    const elementsArray = Array.from(list);
+    elementsArray.forEach(item => {
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            id = e.target.dataset.delete;
+            myModal.show();
+
+            //axios.post("");
+            //console.log("delete item", id);
+            //e.target.closest("tr").remove();
+        });
+    });
+    document.getElementById("btnDeleteConfirm").addEventListener("click", async () => {
+        try {
+            const response = await axios.delete(`/delete_post.php?id=${id}`);
+
+            if (response.status === 200) {
+                var item = document.querySelector('[data-delete="'+id+'"]');
+                item.closest("tr").remove();
+            } else {
+                console.error("Failed to delete item");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+        finally {
+            myModal.hide();
+        }
+    });
+</script>
 </body>
 </html>
